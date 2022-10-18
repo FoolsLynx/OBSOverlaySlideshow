@@ -7,3 +7,7 @@ Packages/
 Library/
 Config.json
 .vsconfig
+*.config
+*.sln
+*.csproj
+Slideshow Images/
