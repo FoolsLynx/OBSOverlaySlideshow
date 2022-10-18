@@ -4,5 +4,6 @@ Temp/
 Logs/
 UserSettings/
 Packages/
+Library/
 Config.json
 .vsconfig
