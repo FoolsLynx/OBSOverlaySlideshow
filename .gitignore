@@ -1,4 +1,7 @@
 .vs/
+obj/
 Temp/
 Logs/
+UserSettings/
 Config.json
+.vsconfig
