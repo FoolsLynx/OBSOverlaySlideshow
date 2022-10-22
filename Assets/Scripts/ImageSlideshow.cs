@@ -146,7 +146,7 @@ public class ImageSlideshow : MonoBehaviour
             int oldIndex = currentIndex;
             while(currentIndex == oldIndex)
             {
-                currentIndex = randomStartIndex ? Random.Range(0, maxIndex) : 0;
+                currentIndex = randomImage ? Random.Range(0, maxIndex) : 0;
             }
         }
         Texture2D tex = ImageLoader.instance.GetImage(currentIndex);
@@ -295,6 +295,7 @@ public class ImageSlideshow : MonoBehaviour
 
         speedSlider.value = settings.displayTime;
         randomImage = settings.randomised;
+        randomStartIndex = settings.randomised;
 
 
         xValue.text = xSlider.value.ToString();
@@ -305,5 +306,7 @@ public class ImageSlideshow : MonoBehaviour
         speedValue.text = speedSlider.value.ToString();
 
         randomToggle.isOn = randomImage;
+
+        controllerPanel.SetActive(showController);
     }
 }
