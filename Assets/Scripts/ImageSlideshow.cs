@@ -134,7 +134,7 @@ public class ImageSlideshow : MonoBehaviour
     private void SetNextImage()
     {
         if (maxIndex <= 1) return;
-        if(randomImage)
+        if(!randomImage)
         {
             currentIndex++;
             if(currentIndex >= maxIndex)
@@ -143,11 +143,18 @@ public class ImageSlideshow : MonoBehaviour
             }
         } else
         {
+            // Get Random Number
+            int r = Random.Range(0, maxIndex);
+            // Get Old Index
             int oldIndex = currentIndex;
+            // Set Current Index
+            currentIndex = r;
             while(currentIndex == oldIndex)
             {
-                currentIndex = randomImage ? Random.Range(0, maxIndex) : 0;
+                r = Random.Range(0, maxIndex);
+                currentIndex = r;
             }
+
         }
         Texture2D tex = ImageLoader.instance.GetImage(currentIndex);
         if(tex == null)
