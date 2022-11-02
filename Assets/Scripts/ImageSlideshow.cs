@@ -5,6 +5,16 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum TransitionType
+{
+    Instant,
+    SlideRight,
+    SlideLeft,
+    SlideUp,
+    SlideDown
+
+}
+
 public class ImageSlideshow : MonoBehaviour
 {
     public RawImage image;
@@ -16,29 +26,47 @@ public class ImageSlideshow : MonoBehaviour
     public bool showController = false;
     public GameObject controllerPanel;
 
+    [Header("Speed")]
     public Slider speedSlider;
     public TextMeshProUGUI speedValue;
 
+    [Header("Randomiser")]
     public Toggle randomToggle;
 
+    [Header("Position")]
     public Slider xSlider;
     public TextMeshProUGUI xValue;
 
     public Slider ySlider;
     public TextMeshProUGUI yValue;
 
+    [Header("Size")]
     public Slider widthSlider;
     public TextMeshProUGUI widthValue;
 
     public Slider heightSlider;
     public TextMeshProUGUI heightValue;
 
-    [Min(1f)]
-    public float imageDisplayTime = 5f;
+    [Header("Transition")]
+    public TMP_Dropdown outDropdown;
+    public TMP_Dropdown inDropdown;
+
+    public Slider transitionSlider;
+    public TextMeshProUGUI transitionValue;
+
+    [Header("Ease")]
+    public TMP_Dropdown outEase;
+    public TMP_Dropdown inEase;
+
+    
+    
 
     [Header("Randomiser")]
     public bool randomStartIndex = true;
     public bool randomImage = true;
+
+    private float imageDisplayTime = 5f;
+    private float transitionTime = 1f;
 
     private int currentIndex;
     private int maxIndex;
@@ -46,7 +74,14 @@ public class ImageSlideshow : MonoBehaviour
     private bool waiting = false;
     private bool pause = false;
 
-    
+    private ImageTransitions transitions;
+
+
+    private TransitionType outType;
+    private TransitionType inType;
+
+    private LeanTweenType easeOutType;
+    private LeanTweenType easeInType;
 
     private void Awake()
     {
@@ -71,6 +106,8 @@ public class ImageSlideshow : MonoBehaviour
             return;
         }
         image.texture = tex;
+
+        transitions = image.GetComponent<ImageTransitions>();
 
         int width = tex.width;
         int height = tex.height;
@@ -116,6 +153,7 @@ public class ImageSlideshow : MonoBehaviour
             return;
         }
         if (pause) return;
+        if (transitions.IsTransitioning) return;
         if(!waiting)
         {
             StartCoroutine(ChangeImage());
@@ -127,8 +165,74 @@ public class ImageSlideshow : MonoBehaviour
     {
         waiting = true;
         yield return new WaitForSeconds(imageDisplayTime);
+
+        TransitionOut();
+        while(transitions.IsTransitioning)
+        {
+            yield return null;
+        }
+
         SetNextImage();
+
+        TransitionIn();
+        while (transitions.IsTransitioning)
+        {
+            yield return null;
+        }
+
+
         waiting = false;
+    }
+
+    private void TransitionOut()
+    {
+        Vector3 startPoint = imageContainer.anchoredPosition;
+        switch(outType)
+        {
+            case TransitionType.Instant:
+                transitions.rectTransform.localPosition = startPoint;
+                break;
+            case TransitionType.SlideRight:
+                StartCoroutine(transitions.SlideRight(transitionTime, startPoint, easeOutType));
+                break;
+            case TransitionType.SlideLeft:
+                StartCoroutine(transitions.SlideLeft(transitionTime, startPoint, easeOutType));
+                break;
+            case TransitionType.SlideDown:
+                StartCoroutine(transitions.SlideDown(transitionTime, startPoint, easeOutType));
+                break;
+            case TransitionType.SlideUp:
+                StartCoroutine(transitions.SlideUp(transitionTime, startPoint, easeOutType));
+                break;
+        }
+        
+    }
+
+    private void TransitionIn()
+    {
+        Vector3 startPoint = imageContainer.anchoredPosition;
+        switch (inType)
+        {
+            case TransitionType.Instant:
+                transitions.rectTransform.localPosition = startPoint;
+                break;
+            case TransitionType.SlideRight:
+                startPoint.x -= widthSlider.value;
+                StartCoroutine(transitions.SlideRight(1f, startPoint, easeInType));
+                break;
+            case TransitionType.SlideLeft:
+                startPoint.x += widthSlider.value;
+                StartCoroutine(transitions.SlideLeft(1f, startPoint, easeInType));
+                break;
+            case TransitionType.SlideDown:
+                startPoint.y -= heightSlider.value;
+                StartCoroutine(transitions.SlideDown(1f, startPoint, easeInType));
+                break;
+            case TransitionType.SlideUp:
+                startPoint.y += heightSlider.value;
+                StartCoroutine(transitions.SlideUp(1f, startPoint, easeInType));
+                break;
+        }
     }
 
     private void SetNextImage()
@@ -233,6 +337,77 @@ public class ImageSlideshow : MonoBehaviour
         FixAspectRatio(newSize);
     }
 
+    public void OnTransitionOutChanged()
+    {
+        outType = outDropdown.value switch
+        {
+            0 => TransitionType.Instant,
+            1 => TransitionType.SlideRight,
+            2 => TransitionType.SlideLeft,
+            3 => TransitionType.SlideUp,
+            4 => TransitionType.SlideDown,
+            _ => TransitionType.Instant,
+        };
+    }
+
+    public void OnTransitionInChanged()
+    {
+        inType = inDropdown.value switch
+        {
+            0 => TransitionType.Instant,
+            1 => TransitionType.SlideRight,
+            2 => TransitionType.SlideLeft,
+            3 => TransitionType.SlideUp,
+            4 => TransitionType.SlideDown,
+            _ => TransitionType.Instant,
+        };
+
+    }
+
+    public void OnEaseOutChanged()
+    {
+        easeOutType = outEase.value switch
+        {
+            0 => LeanTweenType.linear,
+            1 => LeanTweenType.easeOutQuad,
+            2 => LeanTweenType.easeOutCubic,
+            3 => LeanTweenType.easeOutQuart,
+            4 => LeanTweenType.easeOutQuint,
+            5 => LeanTweenType.easeOutSine,
+            6 => LeanTweenType.easeOutExpo,
+            7 => LeanTweenType.easeOutCirc,
+            8 => LeanTweenType.easeOutBounce,
+            9 => LeanTweenType.easeOutBack,
+            10 => LeanTweenType.easeOutElastic,
+            _ => LeanTweenType.notUsed
+        };
+    }
+
+    public void OnEaseInChanged()
+    {
+        easeInType = inEase.value switch
+        {
+            0 => LeanTweenType.linear,
+            1 => LeanTweenType.easeInQuad,
+            2 => LeanTweenType.easeInCubic,
+            3 => LeanTweenType.easeInQuart,
+            4 => LeanTweenType.easeInQuint,
+            5 => LeanTweenType.easeInSine,
+            6 => LeanTweenType.easeInExpo,
+            7 => LeanTweenType.easeInCirc,
+            8 => LeanTweenType.easeInBounce,
+            9 => LeanTweenType.easeInBack,
+            10 => LeanTweenType.easeInElastic,
+            _ => LeanTweenType.notUsed
+        };
+    }
+
+    public void OnTransitionTimeChanged()
+    {
+        transitionTime = transitionSlider.value;
+        transitionValue.text = transitionSlider.value.ToString();
+    }
+
     private void FixAspectRatio(Vector2 newSize)
     {
         if (newSize.x > newSize.y)
@@ -265,7 +440,14 @@ public class ImageSlideshow : MonoBehaviour
             showController = showController,
 
             displayTime = speedSlider.value,
-            randomised = randomToggle.isOn
+            randomised = randomToggle.isOn,
+
+            inType = inDropdown.value,
+            outType = outDropdown.value,
+            easeInType = inEase.value,
+            easeOutType = outEase.value,
+
+            transitionSpeed = transitionSlider.value
             
         };
 
@@ -304,6 +486,13 @@ public class ImageSlideshow : MonoBehaviour
         randomImage = settings.randomised;
         randomStartIndex = settings.randomised;
 
+        inDropdown.SetValueWithoutNotify(settings.inType);
+        outDropdown.SetValueWithoutNotify(settings.outType);
+        
+        inEase.SetValueWithoutNotify(settings.easeInType);
+        outEase.SetValueWithoutNotify(settings.easeOutType);
+
+        transitionSlider.value = settings.transitionSpeed;
 
         xValue.text = xSlider.value.ToString();
         yValue.text = ySlider.value.ToString();
@@ -314,6 +503,14 @@ public class ImageSlideshow : MonoBehaviour
 
         randomToggle.isOn = randomImage;
 
+        OnTransitionInChanged();
+        OnTransitionOutChanged();
+        OnEaseInChanged();
+        OnEaseOutChanged();
+        OnTransitionTimeChanged();
+
         controllerPanel.SetActive(showController);
+
+
     }
 }
