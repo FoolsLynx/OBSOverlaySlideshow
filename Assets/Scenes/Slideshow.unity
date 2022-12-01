@@ -1531,6 +1531,8 @@ MonoBehaviour:
     m_Options:
     - m_Text: None
       m_Image: {fileID: 0}
+    - m_Text: Fade In
+      m_Image: {fileID: 0}
     - m_Text: Slide Right
       m_Image: {fileID: 0}
     - m_Text: Slide Left
@@ -11989,6 +11991,7 @@ GameObject:
   - component: {fileID: 1951542034}
   - component: {fileID: 1951542036}
   - component: {fileID: 1951542035}
+  - component: {fileID: 1951542039}
   - component: {fileID: 1951542037}
   - component: {fileID: 1951542038}
   m_Layer: 5
@@ -12080,6 +12083,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rectTransform: {fileID: 0}
+--- !u!225 &1951542039
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1951542033}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &1962219433
 GameObject:
   m_ObjectHideFlags: 0
@@ -12759,6 +12774,8 @@ MonoBehaviour:
   m_Options:
     m_Options:
     - m_Text: None
+      m_Image: {fileID: 0}
+    - m_Text: Fade Out
       m_Image: {fileID: 0}
     - m_Text: Slide Right
       m_Image: {fileID: 0}

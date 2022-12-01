@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public enum TransitionType
 {
     Instant,
+    Fade,
     SlideRight,
     SlideLeft,
     SlideUp,
@@ -192,6 +193,9 @@ public class ImageSlideshow : MonoBehaviour
             case TransitionType.Instant:
                 transitions.rectTransform.localPosition = startPoint;
                 break;
+            case TransitionType.Fade:
+                StartCoroutine(transitions.Fade(transitionTime, 0f, easeOutType));
+                break;
             case TransitionType.SlideRight:
                 StartCoroutine(transitions.SlideRight(transitionTime, startPoint, easeOutType));
                 break;
@@ -216,21 +220,24 @@ public class ImageSlideshow : MonoBehaviour
             case TransitionType.Instant:
                 transitions.rectTransform.localPosition = startPoint;
                 break;
+            case TransitionType.Fade:
+                StartCoroutine(transitions.Fade(transitionTime, 1f, easeInType));
+                break;
             case TransitionType.SlideRight:
                 startPoint.x -= widthSlider.value;
-                StartCoroutine(transitions.SlideRight(1f, startPoint, easeInType));
+                StartCoroutine(transitions.SlideRight(transitionTime, startPoint, easeInType));
                 break;
             case TransitionType.SlideLeft:
                 startPoint.x += widthSlider.value;
-                StartCoroutine(transitions.SlideLeft(1f, startPoint, easeInType));
+                StartCoroutine(transitions.SlideLeft(transitionTime, startPoint, easeInType));
                 break;
             case TransitionType.SlideDown:
                 startPoint.y -= heightSlider.value;
-                StartCoroutine(transitions.SlideDown(1f, startPoint, easeInType));
+                StartCoroutine(transitions.SlideDown(transitionTime, startPoint, easeInType));
                 break;
             case TransitionType.SlideUp:
                 startPoint.y += heightSlider.value;
-                StartCoroutine(transitions.SlideUp(1f, startPoint, easeInType));
+                StartCoroutine(transitions.SlideUp(transitionTime, startPoint, easeInType));
                 break;
         }
     }
@@ -342,10 +349,11 @@ public class ImageSlideshow : MonoBehaviour
         outType = outDropdown.value switch
         {
             0 => TransitionType.Instant,
-            1 => TransitionType.SlideRight,
-            2 => TransitionType.SlideLeft,
-            3 => TransitionType.SlideUp,
-            4 => TransitionType.SlideDown,
+            1 => TransitionType.Fade,
+            2 => TransitionType.SlideRight,
+            3 => TransitionType.SlideLeft,
+            4 => TransitionType.SlideUp,
+            5 => TransitionType.SlideDown,
             _ => TransitionType.Instant,
         };
     }
@@ -355,10 +363,11 @@ public class ImageSlideshow : MonoBehaviour
         inType = inDropdown.value switch
         {
             0 => TransitionType.Instant,
-            1 => TransitionType.SlideRight,
-            2 => TransitionType.SlideLeft,
-            3 => TransitionType.SlideUp,
-            4 => TransitionType.SlideDown,
+            1 => TransitionType.Fade,
+            2 => TransitionType.SlideRight,
+            3 => TransitionType.SlideLeft,
+            4 => TransitionType.SlideUp,
+            5 => TransitionType.SlideDown,
             _ => TransitionType.Instant,
         };
 
